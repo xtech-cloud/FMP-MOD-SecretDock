@@ -1,0 +1,19 @@
+
+/_dist_/
+/_build_/
+/SecretDock/Assets/TextMesh Pro/
+/SecretDock/Assets/TextMesh Pro.meta
+/SecretDock/Assets/Plugins/
+/SecretDock/Assets/Plugins.meta
+/SecretDock/Assets/3rd/
+/SecretDock/Assets/3rd.meta
+/SecretDock/Library/
+/SecretDock/obj/
+/SecretDock/Logs/
+/SecretDock/Temp/
+/SecretDock/UserSettings/
+/SecretDock/*.sln
+/SecretDock/*.csproj
+/SecretDock/.vsconfig
+/SecretDock/.vs/
+/.UNITY_HOME.env
