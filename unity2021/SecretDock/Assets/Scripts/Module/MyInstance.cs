@@ -6,6 +6,7 @@ using LibMVCS = XTC.FMP.LIB.MVCS;
 using XTC.FMP.MOD.SecretDock.LIB.Proto;
 using XTC.FMP.MOD.SecretDock.LIB.MVCS;
 using System.Collections;
+using System.IO;
 
 namespace XTC.FMP.MOD.SecretDock.LIB.Unity
 {
@@ -17,6 +18,7 @@ namespace XTC.FMP.MOD.SecretDock.LIB.Unity
         public class UiReference
         {
             public GameObject dockRoot;
+            public Button btnEntry;
         }
 
         private UiReference uiReference_ = new UiReference();
@@ -36,6 +38,8 @@ namespace XTC.FMP.MOD.SecretDock.LIB.Unity
         public void HandleCreated()
         {
             uiReference_.dockRoot = rootUI.transform.Find("dock").gameObject;
+            uiReference_.btnEntry = rootUI.transform.Find("dock/btnEntry").GetComponent<Button>();
+            uiReference_.btnEntry.gameObject.SetActive(false);
 
             objListener_ = new GameObject(this.uid + "_listener");
             objListener_.transform.SetParent(rootUI.transform.parent);
@@ -50,9 +54,24 @@ namespace XTC.FMP.MOD.SecretDock.LIB.Unity
             {
                 foreach (var subject in style_.clickArea.subjects)
                 {
-                    publishPreloadSubject(subject);
+                    publishSubject(subject);
                 }
             };
+
+            foreach (var entry in style_.entryS)
+            {
+                var clone = GameObject.Instantiate(uiReference_.btnEntry.gameObject, uiReference_.btnEntry.transform.parent);
+                clone.transform.Find("text").GetComponent<Text>().text = entry.display;
+                clone.SetActive(true);
+                clone.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    HandleClosed();
+                    foreach (var subject in entry.subjects)
+                    {
+                        publishSubject(subject);
+                    }
+                });
+            }
         }
 
         /// <summary>
@@ -86,13 +105,13 @@ namespace XTC.FMP.MOD.SecretDock.LIB.Unity
             rootUI.gameObject.SetActive(false);
         }
 
-        protected void publishPreloadSubject(MyConfig.Subject _subject)
+        protected void publishSubject(MyConfig.Subject _subject)
         {
             var data = new Dictionary<string, object>();
             foreach (var parameter in _subject.parameters)
             {
                 if (parameter.type.Equals("string"))
-                    data[parameter.key] = parameter.value;
+                    data[parameter.key] = parameter.value.Replace("{{RemovableDrive}}", getFirstRemovableDrive());
                 else if (parameter.type.Equals("int"))
                     data[parameter.key] = int.Parse(parameter.value);
                 else if (parameter.type.Equals("float"))
@@ -101,6 +120,19 @@ namespace XTC.FMP.MOD.SecretDock.LIB.Unity
                     data[parameter.key] = bool.Parse(parameter.value);
             }
             (entry_ as MyEntry).getDummyModel().Publish(_subject.message, data);
+        }
+
+        private string getFirstRemovableDrive()
+        {
+            string path = "";
+            foreach (var drive in System.IO.DriveInfo.GetDrives())
+            {
+                if (DriveType.Removable == drive.DriveType)
+                {
+                    path = drive.RootDirectory.FullName;
+                }
+            }
+            return path;
         }
     }
 }

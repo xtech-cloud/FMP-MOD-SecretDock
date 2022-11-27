@@ -28,12 +28,22 @@ namespace XTC.FMP.MOD.SecretDock.LIB.Unity
             public Subject[] subjects { get; set; } = new Subject[0];
         }
 
+        public class Entry
+        {
+            [XmlAttribute("display")]
+            public string display { get; set; } = "";
+            [XmlArray("Subjects"), XmlArrayItem("Subject")]
+            public Subject[] subjects { get; set; } = new Subject[0];
+        }
+
         public class Style
         {
             [XmlAttribute("name")]
             public string name { get; set; } = "";
             [XmlElement("ClickArea")]
             public ClickArea clickArea { get; set; } = new ClickArea();
+            [XmlArray("EntryS"), XmlArrayItem("Entry")]
+            public Entry[] entryS { get; set; } = new Entry[0];
         }
 
 
